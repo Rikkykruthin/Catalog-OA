@@ -5,15 +5,16 @@ function readInput(filePath) {
     return JSON.parse(raw);
 }
 
+
 function decodePoints(data) {
     const { n, k } = data.keys;
     const points = [];
 
     for (let key in data) {
         if (key === "keys") continue;
-        const x = BigInt(key);
+        const x = parseInt(key);
         const { base, value } = data[key];
-        const y = BigInt(parseInt(value, parseInt(base)).toString()); // Convert via base then wrap as BigInt
+        const y = parseInt(value, parseInt(base));
         points.push([x, y]);
     }
 
@@ -24,36 +25,32 @@ function decodePoints(data) {
     return points.slice(0, k);
 }
 
-// Lagrange interpolation at x = 0, using BigInt
+
 function lagrangeSecretAtZero(points) {
-    let secret = 0n;
+    let secret = 0;
 
     for (let i = 0; i < points.length; i++) {
-        let [xi, yi] = points[i];
-        let numerator = 1n;
-        let denominator = 1n;
+        const [xi, yi] = points[i];
+        let li = 1;
 
         for (let j = 0; j < points.length; j++) {
             if (i === j) continue;
-            let [xj] = points[j];
-            numerator *= -xj;
-            denominator *= (xi - xj);
+            const [xj] = points[j];
+            li *= -xj / (xi - xj); // Lagrange basis polynomial at x = 0
         }
 
-        // Multiply yi * numerator / denominator
-        // Do division last to avoid precision loss
-        let term = yi * numerator / denominator;
-        secret += term;
+        secret += yi * li;
     }
 
-    return secret;
+    return Math.round(secret); // Round to remove floating-point error
 }
+
 
 function main() {
     const inputData = readInput('input.json');
     const points = decodePoints(inputData);
     const secret = lagrangeSecretAtZero(points);
-    console.log("Constant Term of Polynomial:", secret.toString());
+    console.log("Constant Term of Polynomial:", secret);
 }
 
 main();
