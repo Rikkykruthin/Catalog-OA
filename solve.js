@@ -80,17 +80,16 @@ function lagrangeSecretAtZero(points) {
 
             const num = -xjBig;
             const den = xiBig - xjBig;
-
             li = mulFractions(li, [num, den]);
         }
 
         const term = mulFractions([yiBig, 1n], li);
         secret = addFractions(secret, term);
     }
-
     const [num, den] = secret;
     return (num + den / 2n) / den; // round to nearest
 }
+
 
 function main() {
     const inputData = readInput('input.json');
